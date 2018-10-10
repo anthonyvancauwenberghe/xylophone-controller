@@ -14,6 +14,7 @@ public class ArduinoSerialManager {
         this.boot();
     }
 
+
     protected void boot() {
         this.arduino.openConnection();
         if (!this.arduino.getSerialPort().isOpen()) {
@@ -47,6 +48,11 @@ public class ArduinoSerialManager {
         }
         char nChar = '\n';
         this.arduino.serialWrite(nChar);
+    }
+
+    @Override
+    public void finalize() {
+        this.arduino.closeConnection();
     }
 
     public static ArduinoSerialManager getInstance() {
