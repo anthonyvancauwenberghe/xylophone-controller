@@ -38,7 +38,7 @@ public class ArduinoSerialManager {
     }
 
     public String read() {
-        return this.arduino.serialRead();
+        return this.arduino.serialRead(0);
     }
 
     public void write(String message) {
