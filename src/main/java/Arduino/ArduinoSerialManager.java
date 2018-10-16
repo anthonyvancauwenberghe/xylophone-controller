@@ -1,7 +1,6 @@
 package Arduino;
 
 import Configs.SerialConfig;
-import arduino.Arduino;
 
 public class ArduinoSerialManager {
 
@@ -17,10 +16,7 @@ public class ArduinoSerialManager {
 
     protected void boot() {
         this.arduino.openConnection();
-        if (!this.arduino.getSerialPort().isOpen()) {
-            throw new RuntimeException("could not find or open connection");
-        }
-        this.listenForIncomingMessages();
+        //this.listenForIncomingMessages();
     }
 
     protected void listenForIncomingMessages() {
@@ -42,12 +38,15 @@ public class ArduinoSerialManager {
     }
 
     public void write(String message) {
+        try {Thread.sleep(10);} catch(Exception e){}
+        System.out.println("sending");
         for (int i = 0; i < message.length(); i++) {
             char c = message.charAt(i);
             this.arduino.serialWrite(c);
         }
         char nChar = '\n';
         this.arduino.serialWrite(nChar);
+        System.out.println("send");
     }
 
     @Override

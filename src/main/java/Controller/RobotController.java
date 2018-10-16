@@ -11,12 +11,19 @@ public class RobotController {
 
     public int angleMotor3;
 
+    public int defaultDelay = 400;
+
 
     public RobotController() {
         this.serialManager = ArduinoSerialManager.getInstance();
     }
 
     public void move(int angleMotor1, int angleMotor2, int angleMotor3) {
+       this.move(angleMotor1,angleMotor2,angleMotor3,this.defaultDelay );
+    }
+
+    public void move(int angleMotor1, int angleMotor2, int angleMotor3,int delay) {
+        try {Thread.sleep(delay);} catch(Exception e){}
         this.processSafetyControls(angleMotor1, angleMotor2, angleMotor3);
         this.serialManager.write(String.valueOf(angleMotor1) + ',' + String.valueOf(angleMotor2) + ',' + String.valueOf(angleMotor3));
         this.angleMotor1 = angleMotor1;
@@ -28,7 +35,7 @@ public class RobotController {
         if (angleMotor1 < -20 || angleMotor1 > 35) {
             throw new RuntimeException("Safety Values bottom motor Exceeded");
         }
-        if (angleMotor2 < -80 || angleMotor2 > -40) {
+        if (angleMotor2 < -90 || angleMotor2 > -40) {
             throw new RuntimeException("Safety Values middle motor Exceeded");
         }
         if (angleMotor3 < -10 || angleMotor3 > 60) {
