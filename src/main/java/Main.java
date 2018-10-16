@@ -10,7 +10,7 @@ public class Main {
 
 
 
-        Sequence sequence = new StarWars(player);
+        Sequence sequence = new StarWars2(player);
         sequence.play();
 
         /*

@@ -10,16 +10,16 @@ public class StarWars2 implements Sequence {
     }
     public void play() {
         player.playE();
-        player.playE();
-        player.playE();
+        player.playE(250);
+        player.playE(250);
 
-        player.playCLow();
+        player.playCLow(200);
         player.playG();
-        player.playE();
+        player.playE(-150);
 
-        player.playCLow();
+        player.playCLow(200);
         player.playG();
-        player.playE();
+        player.playE(-150);
 
 
     }
