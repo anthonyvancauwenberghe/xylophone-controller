@@ -1,23 +1,15 @@
-import Controller.RobotController;
-import Player.KeyPlayer;
-import Sequences.*;
+import Player.SongPlayer;
+import Player.SoundKeyPlayer;
+import Songs.StarWars2Song;
+import Songs.StarWarsSong;
 
 public class Main {
 
     public static void main(String[] args) {
-        RobotController controller = new RobotController();
-        KeyPlayer player = new KeyPlayer(controller);
+       /* RobotController controller = new RobotController();
+        RobotKeyPlayer player = new RobotKeyPlayer(controller);*/
 
-
-
-        Sequence sequence = new StarWars2(player);
-        sequence.play();
-
-        /*
-        Sequence sequence = new StarWars(player);
-        sequence.play();*/
-
-
-        player.goMiddle(6);
+        SongPlayer player = new SongPlayer(new StarWars2Song(),new SoundKeyPlayer());
+        player.play();
     }
 }

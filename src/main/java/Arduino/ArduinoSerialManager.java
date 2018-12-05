@@ -1,6 +1,6 @@
 package Arduino;
 
-import Configs.SerialConfig;
+import Configs.Config;
 
 public class ArduinoSerialManager {
 
@@ -9,7 +9,7 @@ public class ArduinoSerialManager {
     protected final Arduino arduino;
 
     private ArduinoSerialManager() {
-        this.arduino = new Arduino(SerialConfig.PORT, SerialConfig.BAUD_RATE);
+        this.arduino = new Arduino(Config.PORT, Config.BAUD_RATE);
         this.boot();
     }
 
