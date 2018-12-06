@@ -13,7 +13,7 @@ public class Main {
         RobotController controller = new RobotController();
         //KeyPlayer keyPlayer = new RobotKeyPlayer(controller);
 
-        Song song = new OdeToJoySong();
+        Song song = new StarWarsSong();
         KeyPlayer keyPlayer = new RobotKeyPlayer(controller);
 
         SongPlayer songPlayer = new SongPlayer(song, keyPlayer);
