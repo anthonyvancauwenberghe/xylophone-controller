@@ -21,6 +21,6 @@ public class AllKeysSong extends Song {
 
     @Override
     protected int defaultTempo() {
-        return 118;
+        return 40;
     }
 }

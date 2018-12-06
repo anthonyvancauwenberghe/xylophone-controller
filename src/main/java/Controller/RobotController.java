@@ -11,7 +11,7 @@ public class RobotController {
 
     public int angleMotor3;
 
-    public int defaultDelay = 400;
+    public int defaultDelay = 150;
 
 
     public RobotController() {

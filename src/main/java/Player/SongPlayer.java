@@ -12,7 +12,8 @@ public class SongPlayer {
     public SongPlayer(Song song, KeyPlayer player) {
         this.song = song;
         this.player = player;
-        this.adjustTempoToRobotLimits();
+        if (this.player instanceof RobotKeyPlayer)
+            this.adjustTempoToRobotLimits();
     }
 
     public final void play() {

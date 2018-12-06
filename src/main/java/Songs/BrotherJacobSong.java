@@ -52,6 +52,6 @@ public class BrotherJacobSong extends Song {
 
     @Override
     protected int defaultTempo() {
-        return 120;
+        return 150;
     }
 }
