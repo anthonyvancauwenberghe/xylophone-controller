@@ -1,26 +1,26 @@
 #include <math.h>
 #include "kinematics.h"
-#include <iostream>
-using namespace std;
+//#include <iostream>
+//using namespace std;
 
 const double RADIAN = 0.0174533;
 
-double toRadians(double d){
+double Kinematics::toRadians(double d){
     return d * RADIAN;
 }
-double toDegrees(double r){
+double Kinematics::toDegrees(double r){
     return r/RADIAN;
 }
 
-double law_of_cosines(double a, double b, double c){
+double Kinematics::law_of_cosines(double a, double b, double c){
     return toDegrees(acos( ( pow(a,2) + pow(b,2) - pow(c,2) ) / (2*a*b) ) );
 }
 
-double tangent_law(double a, double b, double alpha){
+double Kinematics::tangent_law(double a, double b, double alpha){
     return atan(b*sin(toRadians(-alpha))/(a+b*cos(toRadians(-alpha))));
 }
 
-Vector2 getPointOnCircle(Vector2 origin, double radius, double degrees){
+Vector2 Kinematics::getPointOnCircle(Vector2 origin, double radius, double degrees){
 
     double x = cos(toRadians(degrees)) * radius;
     double y = -sin(toRadians(degrees)) * radius;
@@ -29,41 +29,41 @@ Vector2 getPointOnCircle(Vector2 origin, double radius, double degrees){
     return vector;
 }
 
-double getCircleArc(double radius, double x){
+double Kinematics::getCircleArc(double radius, double x){
 
     return toDegrees(acos(x/radius));
 }
 
-Vector3 getModTop(Vector3 orig, double radius, double degrees){
+Vector3 Kinematics::getModTop(Vector3 orig, double radius, double degrees){
 
     Vector2 in(orig.x,orig.z);
     Vector2 out = getPointOnCircle( in ,radius,-90-degrees);
     return {out.x, orig.y, out.y};
 }
 
-Vector3 getModSide(Vector3 orig, double radius, double degrees){
+Vector3 Kinematics::getModSide(Vector3 orig, double radius, double degrees){
     Vector2 in ( orig.z,orig.y);
     Vector2 out = getPointOnCircle( in ,radius,-90+degrees);
     return {orig.x,out.y,out.x};
 }
 
-double getDegTop(Vector3 orig, double radius, Vector3 pos){
+double Kinematics::getDegTop(Vector3 orig, double radius, Vector3 pos){
     return 90-getCircleArc(radius,-(pos.x-orig.x));
 }
 
-Vector3 getOffsetModTop(Vector3 effect, double d){
+Vector3 Kinematics::getOffsetModTop(Vector3 effect, double d){
     double dst = Vector2(effect.x,effect.z).dst(Vector2(FLEX_S2.x,FLEX_S2.z));
     double arc_offset = getDegTop(FLEX_S2,dst, effect);
     return getModTop(Vector3(FLEX_S2.x,effect.y,FLEX_S2.z),dst,-d+arc_offset);
 }
 
-double getDegSide(Vector3 orig, double radius, Vector3 pos){
+double Kinematics::getDegSide(Vector3 orig, double radius, Vector3 pos){
     return getCircleArc(radius,pos.z-orig.z);
 }
 
 //Forward kinematics
 
-Vector3 getEffectorPos(double servo1, double servo2, double servo3){
+Vector3 Kinematics::getEffectorPos(double servo1, double servo2, double servo3){
 
     Vector3 flex_s3 = getModSide(FLEX_S2,L2,servo2);
     Vector3 reach = getModSide({STICK_OFFSET,flex_s3.y,flex_s3.z},L3,servo2+servo3);
@@ -72,7 +72,7 @@ Vector3 getEffectorPos(double servo1, double servo2, double servo3){
 
 //Inverse kinematics
 
-Vector3 getDegs(Vector3 pos){
+Vector3 Kinematics::getDegs(Vector3 pos){
 
     //d1
     double dst = Vector2(pos.x,pos.z).dst(Vector2(FLEX_S2.x,FLEX_S2.z));
@@ -89,14 +89,12 @@ Vector3 getDegs(Vector3 pos){
     return {d1,d2,d3};
 }
 
-int main()
-{
-    Vector3 pos = getEffectorPos(10,15,30);
-    pos.print();
-    Vector3 servos = getDegs(pos);
-    servos.print();
-    return 0;
-}
+//int main()
+//{
+//    Kinematics kinematics;
+//    kinematics.getEffectorPos(10,15,30).print();
+//    return 0;
+//}
 
 
 

@@ -2,8 +2,8 @@
 // Created by Dudd3r on 12/8/2018.
 //
 #include <math.h>
-#include <iostream>
-using namespace std;
+//#include <iostream>
+//using namespace std;
 #ifndef KINEMATICS_KINEMATICS_H
 #define KINEMATICS_KINEMATICS_H
 #endif //KINEMATICS_KINEMATICS_H
@@ -28,9 +28,9 @@ public:
         x -= v.x;
         y -= v.y;
     };
-    void print(){
-        cout << "Vector2 [" << x << "," << y << "]\n";
-    }
+//    void print(){
+//        cout << "Vector2 [" << x << "," << y << "]\n";
+//    }
 };
 
 class Vector3{
@@ -56,9 +56,30 @@ public:
         y -= v.y;
         z -= v.z;
     };
-    void print(){
-        cout << "Vector3 [" << x << "," << y << "," << z << "]\n";
-    }
+//    void print(){
+//        cout << "Vector3 [" << x << "," << y << "," << z << "]\n";
+//    }
+};
+
+class Kinematics{
+public:
+    Kinematics() = default;
+    Vector3 getEffectorPos(double servo1, double servo2, double servo3);
+    Vector3 getDegs(Vector3 pos);
+
+private:
+    double toRadians(double d);
+    double toDegrees(double r);
+    double law_of_cosines(double a, double b, double c);
+    double tangent_law(double a, double b, double alpha);
+    Vector2 getPointOnCircle(Vector2 origin, double radius, double degrees);
+    double getCircleArc(double radius, double x);
+    Vector3 getModTop(Vector3 orig, double radius, double degrees);
+    Vector3 getModSide(Vector3 orig, double radius, double degrees);
+    double getDegTop(Vector3 orig, double radius, Vector3 pos);
+    Vector3 getOffsetModTop(Vector3 effect, double d);
+    double getDegSide(Vector3 orig, double radius, Vector3 pos);
+
 };
 
 //Measurements
