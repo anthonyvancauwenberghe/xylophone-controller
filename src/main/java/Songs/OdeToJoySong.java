@@ -84,6 +84,6 @@ public class OdeToJoySong extends Song {
 
     @Override
     protected int defaultTempo() {
-        return 100 ;
+        return 120 ;
     }
 }

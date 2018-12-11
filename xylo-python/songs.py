@@ -1,4 +1,4 @@
-#C0 D E F G A B C1
+g#C0 D E F G A B C1
 # 0 1 2 3 4 5 6 7
 
 class Note:

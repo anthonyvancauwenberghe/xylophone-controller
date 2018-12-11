@@ -42,6 +42,6 @@ public class JingleBellsSong extends Song {
 
     @Override
     protected int defaultTempo() {
-        return 80 ;
+        return 140 ;
     }
 }

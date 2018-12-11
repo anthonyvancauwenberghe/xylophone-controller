@@ -1,12 +1,12 @@
 package Player;
 
-import Controller.RobotController;
+import Controller.RobotControllerOneSequence;
 
 public class RobotKeyPlayer implements KeyPlayer {
 
-    protected RobotController controller;
+    protected RobotControllerOneSequence controller;
 
-    public RobotKeyPlayer(RobotController controller) {
+    public RobotKeyPlayer(RobotControllerOneSequence controller) {
         this.controller = controller;
     }
 

@@ -9,7 +9,7 @@ from songs import Vector
 # range test
 # simulation hook
 
-default_port = 'COM4'
+default_port = '/dev/ttyACM0'
 default_baud = 115200
 ser_timeout = 10
 ser = serial.Serial(default_port, default_baud)

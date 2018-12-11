@@ -2,7 +2,7 @@ package Controller;
 
 import Arduino.ArduinoSerialManager;
 
-public class RobotController {
+public class RobotControllerOneSequence {
     protected ArduinoSerialManager serialManager;
 
     public int angleMotor1;
@@ -14,7 +14,7 @@ public class RobotController {
     public int defaultDelay = 150;
 
 
-    public RobotController() {
+    public RobotControllerOneSequence() {
         this.serialManager = ArduinoSerialManager.getInstance();
     }
 

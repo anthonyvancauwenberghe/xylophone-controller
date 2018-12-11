@@ -1,6 +1,5 @@
-import Controller.RobotController;
+import Controller.InverseKinematicsController;
 import Player.KeyPlayer;
-import Player.RobotKeyPlayer;
 import Player.SongPlayer;
 import Player.SoundKeyPlayer;
 import Sequences.Song;
@@ -10,15 +9,18 @@ public class Main {
 
     public static void main(String[] args) {
 
-      //  RobotController controller = new RobotController();
+      //  RobotControllerOneSequence controller = new RobotControllerOneSequence();
         //KeyPlayer keyPlayer = new RobotKeyPlayer(controller);
 
         Song song = new JingleBellsSong();
        // KeyPlayer keyPlayer = new RobotKeyPlayer(controller);
 
-        KeyPlayer keyPlayer = new SoundKeyPlayer();
+        //KeyPlayer keyPlayer = new SoundKeyPlayer();
 
-        SongPlayer songPlayer = new SongPlayer(song, keyPlayer);
-        songPlayer.play();
+       // SongPlayer songPlayer = new SongPlayer(song, keyPlayer);
+        //songPlayer.play();
+
+        InverseKinematicsController controller = new InverseKinematicsController(song);
+        controller.send();
     }
 }
