@@ -38,6 +38,7 @@ public class SoundKeyPlayer implements KeyPlayer {
 
 
     protected void playSound(String key) {
+        System.out.println(key);
         (new MediaPlayer("sounds/" + key + ".wav", false)).musicStart();
     }
 

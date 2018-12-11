@@ -34,6 +34,6 @@ public class StarWarsSong extends Song {
 
     @Override
     protected int defaultTempo() {
-        return 140;
+        return 110;
     }
 }
