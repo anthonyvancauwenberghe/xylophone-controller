@@ -10,11 +10,13 @@ public class Main {
 
     public static void main(String[] args) {
 
-        RobotController controller = new RobotController();
+      //  RobotController controller = new RobotController();
         //KeyPlayer keyPlayer = new RobotKeyPlayer(controller);
 
-        Song song = new StarWarsSong();
-        KeyPlayer keyPlayer = new RobotKeyPlayer(controller);
+        Song song = new JingleBellsSong();
+       // KeyPlayer keyPlayer = new RobotKeyPlayer(controller);
+
+        KeyPlayer keyPlayer = new SoundKeyPlayer();
 
         SongPlayer songPlayer = new SongPlayer(song, keyPlayer);
         songPlayer.play();

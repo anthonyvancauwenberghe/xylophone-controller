@@ -2,6 +2,7 @@ package Sound;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.sound.sampled.*;
 
@@ -40,17 +41,30 @@ public class MediaPlayer
         }
         else
         {
-            clip.start();
-            //starts music as not on loop
-        }
+            Thread thread = new Thread(){
+                public void run(){
+                    clip.start();
+                    long startTime = System.currentTimeMillis();
+                    long elapsedTime = 0L;
 
+                    while (elapsedTime < clip.getMicrosecondLength()/1000 + 1250) {
+                        elapsedTime = (new Date()).getTime() - startTime;
+                    }
+                    musicStop();
+                    this.interrupt();
+                    return;
+                }
+            };
+
+            thread.start();
+        }
     }
 
 
     public void musicStop ()
-    //stops the music
     {
         clip.stop();
+        clip.close();
     }
 
 }
