@@ -19,10 +19,10 @@ const int SERVO3_OFFSET = -15; // small top servo
 
 //Movement Configs
 const int STABILITY_DELAY = 10;
-const float HOVER_HEIGHT = 1.6; // cm / 10
-const float HIT_DROP = 0.25;
-const float LIFT_DELAY = 5;
-const Vector3 DEFAULT_POS = Vector3(0,1.6,0);
+const float HOVER_HEIGHT = 1.8; // cm / 10
+const float HIT_DROP = 0.3;
+const float LIFT_DELAY = 40;
+const Vector3 DEFAULT_POS = Vector3(0,HOVER_HEIGHT,0);
 
 //Dyn
 boolean busy_playing = 0;
@@ -132,6 +132,8 @@ void executeSequence(){
       //wait
       if(i!=0){
         delay(dly_sequence[i-1]);
+      }else{
+        delay(1000);
       }
       //hit
       hitKey();
@@ -141,6 +143,7 @@ void executeSequence(){
   Serial.println("Finished playing.");
   Serial.flush();
   busy_playing = 0;
+  packeti = 0;
   setServos(kinematics.getDegs(DEFAULT_POS));
 }
 
@@ -149,6 +152,7 @@ void hitKey(){
   setServos(kinematics.getDegs(target));
   delay(LIFT_DELAY);
   setServos(kinematics.getDegs(current_pos));
+  delay(LIFT_DELAY);
 }
 
 void printSequence(){
