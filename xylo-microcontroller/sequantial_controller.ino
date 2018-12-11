@@ -1,32 +1,66 @@
 #include <kinematics.h>
-#include <Servo.h>
+#include <Adafruit_PWMServoDriver.h>
 
-const int PRINT_PRECISION = 3;
+#define SERVOMIN  112// this is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX  560// this is the 'maximum' pulse length count (out of 4096)
+
+//Connect servos to correct pins
+#define SERVO1 0 //bottom
+#define SERVO2 1 //mid
+#define SERVO3 2 //top
+
+//Misc const
+const boolean DEBUG = 1;
 const int MAX_NUM_NOTES = 50;
 
-const int SERVO1_BOUNDS[2] = {-60,60};
-const int SERVO2_BOUNDS[2] = {0,90};
-const int SERVO3_BOUNDS[2] = {-45,45};
+//Offsets
+const int SERVO1_OFFSET = 5; // bottom servo
+const int SERVO3_OFFSET = -15; // small top servo
 
-const boolean DEBUG = 1;
+//Movement Configs
+const int STABILITY_DELAY = 10;
+const float HOVER_HEIGHT = 1.6; // cm / 10
+const float HIT_DROP = 0.25;
+const float LIFT_DELAY = 5;
+const Vector3 DEFAULT_POS = Vector3(0,1.6,0);
 
+//Dyn
 boolean busy_playing = 0;
-Vector3 pos_sequence[MAX_NUM_NOTES];
-double dly_sequence[MAX_NUM_NOTES];
+Vector3 current_pos;
+int packeti = 0;
 
-Servo servo1;
-Servo servo2;
-Servo servo3;
+//Sequence (song)
+Vector3 pos_sequence[MAX_NUM_NOTES];
+int dly_sequence[MAX_NUM_NOTES];
+
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 Kinematics kinematics;
 
+#ifdef __arm__
+// should use uinstd.h to define sbrk but Due causes a conflict
+extern "C" char* sbrk(int incr);
+#else  // __ARM__
+extern char *__brkval;
+#endif  // __arm__
+ 
+int freeMemory() {
+  char top;
+#ifdef __arm__
+  return &top - reinterpret_cast<char*>(sbrk(0));
+#elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
+  return &top - __brkval;
+#else  // __arm__
+  return __brkval ? &top - __brkval : &top - __malloc_heap_start;
+#endif  // __arm__
+}
+
 void setup() {
-  
-//  servo1.attach();
-//  servo2.attach();
-//  servo3.attach();
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Xylophone controller");
+  pwm.begin();
+  pwm.setPWMFreq(60);
+  setServos(kinematics.getDegs(DEFAULT_POS));
 }
 
 void loop(){
@@ -40,104 +74,94 @@ void loop(){
   }
 }
 
-void setServo(int servoid, double degrees){
-   if(DEBUG){Serial.print("Setting servo ");Serial.print(servoid);Serial.print(" ");Serial.println(degrees);}
-   switch(servoid){
-    case 1:
-      if(degrees < SERVO1_BOUNDS[0] || degrees > SERVO1_BOUNDS[1]){
-        Serial.println("Warning: Outbound servo1 setting!");
-        break;
-      }else{
-        servo1.write(degrees);
-        break;
-      }
-    case 2:
-      if(degrees < SERVO2_BOUNDS[0] || degrees > SERVO2_BOUNDS[1]){
-        Serial.println("Warning: Outbound servo2 setting!");
-        break;
-      }else{
-        servo2.write(degrees);
-        break;
-      }
-    case 3:
-      if(degrees < SERVO3_BOUNDS[0] || degrees > SERVO3_BOUNDS[1]){
-        Serial.println("Warning: Outbound servo3 setting!");
-        break;
-      }else{
-        servo3.write(degrees);
-        break;
-      }
-    default:
-      Serial.println("Warning: Invalid servoID!");
-  }
+void setServos(Vector3 angle_vector){
+  float s1 = -angle_vector.x+SERVO1_OFFSET;
+  float s2 = -angle_vector.y;
+  float s3 = angle_vector.z+SERVO3_OFFSET;
+  Serial.print("Setting servos: ");
+  Serial.print(s1);Serial.print(" ");
+  Serial.print(s2);Serial.print(" ");
+  Serial.println(s3);
+  writeToMotor(SERVO1,s1);
+  writeToMotor(SERVO2,s2);
+  writeToMotor(SERVO3,s3);
 }
 
-double readServo(int servoid){
-  switch(servoid){
-    case 1:
-      return servo1.read();
-    case 2:
-      return servo2.read();
-    case 3:
-      return servo3.read();
-    default:
-      Serial.println("Warning: Invalid servoID!");
-      return 0;
-  }
+void writeToMotor(int j,double pwmvalue)
+{  
+  pwmvalue = map(pwmvalue,-90,90,SERVOMIN,SERVOMAX);
+  // do not remove this safety function to avoid hardware damages
+  pwmvalue = constrain(pwmvalue,SERVOMIN,SERVOMAX);
+  pwm.setPWM(j, 0, pwmvalue); // function by Adafruit library
+  delay(STABILITY_DELAY);
 }
 
 boolean readCMD(){
   
   if(Serial.available()){
-    Serial.println("Reading.");
-    String cmdstr = Serial.readStringUntil("\n");
-    int i = 0;
-    while(cmdstr.indexOf(";") != -1){
-        String seqpart = cmdstr.substring(0,cmdstr.indexOf(";"));
-        String x = seqpart.substring(0,seqpart.indexOf(","));
-        seqpart = seqpart.substring(seqpart.indexOf(",")+1,seqpart.length());
-        String y = seqpart.substring(0,seqpart.indexOf(","));
-        seqpart = seqpart.substring(seqpart.indexOf(",")+1,seqpart.length());
-        String z = seqpart.substring(0,seqpart.indexOf(","));
-        seqpart = seqpart.substring(seqpart.indexOf(",")+1,seqpart.length());
-        String d = seqpart.substring(0,seqpart.indexOf(","));
-        cmdstr = cmdstr.substring(cmdstr.indexOf(";")+1,cmdstr.length());
-        pos_sequence[i] = Vector3(x.toFloat(),y.toFloat(),z.toFloat());
-        dly_sequence[i] = d.toFloat();
-        i++;
+    String cmd = Serial.readStringUntil('\n');
+    Serial.println(cmd);
+    while(cmd.indexOf(';')!=-1){
+      recordPacket(cmd.substring(0,cmd.indexOf(';')));
+      packeti++;
+      cmd = cmd.substring(cmd.indexOf(';')+1,cmd.length());
     }
-    Serial.flush();
     return 1;
-  }else{
-    return 0;
   }
+  return 0;
+}
+
+void recordPacket(String packet){
+  String x = packet.substring(0,packet.indexOf(","));
+  packet = packet.substring(packet.indexOf(",")+1,packet.length());
+  String z = packet.substring(0,packet.indexOf(","));
+  packet = packet.substring(packet.indexOf(",")+1,packet.length());
+  String d = packet.substring(0,packet.indexOf(","));
+  pos_sequence[packeti] = Vector3(x.toFloat(),HOVER_HEIGHT,z.toFloat());
+  dly_sequence[packeti] = d.toInt();
+  //Serial.println(freeMemory());
 }
 
 void executeSequence(){
-  busy_playing = 0;
-  for(int i=0; i<MAX_NUM_NOTES; i++){
+  Serial.println("-------------SONG--------------");
+  for(int i=0; i<packeti; i++){
     if(dly_sequence[i]!=0){
-      double s1 = kinematics.getDegs(pos_sequence[i]).x;
-      double s2 = kinematics.getDegs(pos_sequence[i]).y;
-      double s3 = kinematics.getDegs(pos_sequence[i]).z;
-      setServo(1,s1);
-      setServo(2,s2);
-      setServo(3,s3);
-      delay(dly_sequence[i]);
+      //move
+      setServos(kinematics.getDegs(pos_sequence[i]));
+      current_pos = pos_sequence[i];
+      //wait
+      if(i!=0){
+        delay(dly_sequence[i-1]);
+      }
+      //hit
+      hitKey();
     }
   }
+  Serial.println("-------------------------------");
   Serial.println("Finished playing.");
+  Serial.flush();
+  busy_playing = 0;
+  setServos(kinematics.getDegs(DEFAULT_POS));
+}
+
+void hitKey(){
+  Vector3 target = Vector3(current_pos.x,current_pos.y-HIT_DROP,current_pos.z);
+  setServos(kinematics.getDegs(target));
+  delay(LIFT_DELAY);
+  setServos(kinematics.getDegs(current_pos));
 }
 
 void printSequence(){
-
+  Serial.println("-------------SEQUENCE--------------");
   for(int i=0; i<MAX_NUM_NOTES; i++){
     if(dly_sequence[i]!=0){
+      
       Serial.print(V3toString(pos_sequence[i]));
       Serial.print(" delay: ");
       Serial.println(dly_sequence[i]);
     }
   }
+  Serial.println("-----------------------------------");
 }
 
 char* V3toString(Vector3 v){
@@ -147,16 +171,14 @@ char* V3toString(Vector3 v){
   const char t[2] = ")";
   char x[10],y[10],z[10];
   strcpy(str, h);
-  dtostrf(v.x,PRINT_PRECISION+3,PRINT_PRECISION,x);
+  String(v.x).toCharArray(x,10);
   strcat(str, x);
   strcat(str, c);
-  dtostrf(v.y,PRINT_PRECISION+3,PRINT_PRECISION,y);
+  String(v.y).toCharArray(y,10);
   strcat(str, y);
   strcat(str, c);
-  dtostrf(v.z,PRINT_PRECISION+3,PRINT_PRECISION,z);
+  String(v.z).toCharArray(z,10);
   strcat(str, z);
   strcat(str, t);
   return str;
 }
-
-
