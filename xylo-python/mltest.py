@@ -33,7 +33,7 @@ def construct_prediction_table(p):
 def build_model():
     data = np.array(train_data)
     model = keras.Sequential([
-    keras.layers.Dense(3,  activation=tf.nn.relu,
+    keras.layers.Dense(3,  activation=keras.activations.relu,
                             input_shape=(data.shape[1],)),
     keras.layers.Dense(9, activation=keras.activations.tanh),
     keras.layers.Dense(1, activation=keras.activations.linear)
