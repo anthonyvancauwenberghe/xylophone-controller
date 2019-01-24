@@ -5,20 +5,14 @@ from BorderTracker import BorderTracker
 
 SHOW_IMAGE = True
 
-trackingSystem = TrackingSystem()
-cap = cv2.VideoCapture(1)
+ROI = (181, 357, 831, 363)
+
+cap = cv2.VideoCapture(0)
 cap.set(3, int(1280))
 cap.set(4, int(720))
 
-for i in range(30):
-    _, frame = cap.read()
+def getSetupCenter():    
 
-""" ROI = cv2.selectROI(frame)
-print('Selected ROI: ', ROI) """
-
-ROI = (181, 357, 831, 363)
-
-def getSetupCenter():
     _, frame = cap.read()
     img_crop = frame[int(ROI[1]):int(ROI[1] + ROI[3]), int(ROI[0]):int(ROI[0] + ROI[2])]
     borderTracker = BorderTracker()
@@ -45,6 +39,7 @@ def getSetupCenter():
     return (cX, cY, m, c)
 
 def getVisionData(setupCenterX, setupCenterY, setupM, setupC):
+    trackingSystem = TrackingSystem()
     coordinates = None
     # Load image, resize and convert color to HSV
     for i in range(15):
@@ -77,7 +72,3 @@ def getVisionData(setupCenterX, setupCenterY, setupM, setupC):
         cv2.destroyAllWindows()
 
     return coordinates
-
-
-# (setupCenterX, setupCenterY, setupM, setupC) = getSetupCenter()
-# coordinates = getVisionData(setupCenterX, setupCenterY, setupM, setupC)
