@@ -1,0 +1,6 @@
+Bord center is 387.5 241.0
+/home/jeeza/Code/computer-vision/Utilities.py:16: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
+To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
+  m, c = lstsq(A, y_coords)[0]
+Line Solution is y = -0.016643550624133013x + 247.4493758668516
+Line Solution is y = -0.3022670025188917x + 280.8513853904282

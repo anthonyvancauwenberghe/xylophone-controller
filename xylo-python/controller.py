@@ -2,7 +2,7 @@ import serial
 import time
 import songs
 from songs import Vector
-
+import computervision
 #Todo
 # speed limits test
 # hit accuracy test
@@ -17,8 +17,6 @@ serial_timeout = 2
 
 BPM = 90
 BPMS = 60000 / BPM * 4
-
-
 
 keypositions = [    Vector(-0.175-0.95,0),Vector(-0.175-0.6,0),Vector(-0.175-0.4,0),Vector(-0.175-0.13,0),
                      Vector(-0.175+0.13,0),Vector(-0.175+0.44,0),Vector(-0.175+0.74,0),Vector(-0.175+0.97,0) ]
@@ -49,8 +47,10 @@ def printIncoming():
 
 def getKeyPositions():
     #vision code here
+    (setupCenterX, setupCenterY, setupM, setupC) = getSetupCenter()
+    coordinates = getVisionData(setupCenterX, setupCenterY, setupM, setupC)
     #keypositions = vision.getKeyPosArray()
-    print("")
+    print(coordinates)
 
 def getTravelCorr(x):
     return -x*0.025
@@ -96,8 +96,9 @@ def imitate():
     print("")
 
 
+getKeyPositions()
 #play_recording(songs.DETECT)
-play_song(songs.ODE_TO_JOY)
+#play_song(songs.ODE_TO_JOY)
 #songToSequence(songs.SCALE2)
 
 
